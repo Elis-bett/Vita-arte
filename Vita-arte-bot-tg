@@ -1,0 +1,113 @@
+import logging
+from telegram.ext import Application, MessageHandler, filters
+from config import BOT_TOKEN
+from telegram.ext import CommandHandler
+import datetime as dt
+from telegram import ReplyKeyboardMarkup
+from telegram import ReplyKeyboardRemove
+
+logging.basicConfig(
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
+)
+
+logger = logging.getLogger(__name__)
+
+
+async def start(update, context):
+    """Отправляет сообщение когда получена команда /start"""
+    user = update.effective_user
+    await update.message.reply_html(
+        "Привет от команды онлайн школы Vita-arte! &#128075; \n "
+        "Наш бот поможет Вам узнать больше о нас, определиться с направлением а так же записаться к нам. \n"
+        " Успехов в учебе &#128156;",
+        reply_markup=markup
+    )
+    await update.message.reply_html(
+        "&#11088;Чтобы узнать больше информации о школе используйте команду /info\n"
+        "&#11088;Чтобы записаться на обучение используйте команду /reg \n"
+        "&#11088;Хотите рисовать, но не можете определиться с направлением? &#128533;"
+        " Мы поможем вам, проведя небольшое тестирование, для этого используйте команду /test \n"
+        "&#11088;Если остались вопросы, всегда можно обратиться к администратору &#128222;, используйте команду /help",
+        reply_markup=markup
+    )
+
+
+async def help_command(update, context):
+    """Отправляет сообщение когда получена команда /help"""
+    await update.message.reply_html("Я пока не умею помогать... Я только ваше эхо.")
+
+
+async def info_command(update, context):
+    """Отправляет сообщение когда получена команда /info"""
+    await update.message.reply_html("&#128231;Онлайн-школа Vita arte - проект, в рамках которого все желающие и имеющие"
+                                    " трудности с получением художественного образования смогут легко получить его. \n"
+                                    "&#127775;Особенности Vita arte&#127775; \n"
+                                    "&#128396; все курсы созданы на базе академических программ художественных ВУЗов\n"
+                                    "&#128396; форматы самостоятельного обучения или с прямой связью с педагогом\n"
+                                    "&#128396; занятия ведут только профессиональные художники с опытом преподавания\n"
+                                    "&#128396; наличие прямой связи с ведущими художественными ВУЗами, позволяющая "
+                                    "заранее определиться с выбором\n"
+                                    "&#128396; большой выбор направлений")
+    await update.message.reply_html("Наша онлайн-школа решает следующие проблемы:\n"
+                                    "&#127979; поступление в ВУЗы, СУЗы без художественного образования\n"
+                                    "&#127979; отсутствие возможности получить качественное художественное образование\n"
+                                    "&#127979; отсутствие возможности учиться в очном формате")
+    await update.message.reply_html('Если мы вас заинтересовали, вы можете узнать больше о каждом из направлений:\n'
+                                    '&#127912;живопись\n'
+                                    '&#127912;графика\n'
+                                    '&#127912;дизайн\n'
+                                    '&#127912;роспись\n'
+                                    'выбрав их на клавиатуре &#128521;', reply_markup=markup1)
+
+
+async def registration_command(update, context):
+    """Отправляет сообщение когда получена команда /reg"""
+    await update.message.reply_html('Регистрация не доступна на данный момент&#128565;')
+
+
+async def test_command(update, context):
+    """Отправляет сообщение когда получена команда /test"""
+    await update.message.reply_html('Тесты в процессе разработки&#128579;')
+
+
+async def back_command(update, context):
+    """Отправляет сообщение когда получена команда /back"""
+    await update.message.reply_html('Пожалуйста, выберите, что вас интересует&#128522;', reply_markup=markup)
+
+
+async def echo(update, context):
+    if 'живопись' in update.message.text:
+        await update.message.reply_html(f'Информация о курсах пока разрабатывается', reply_markup=markup2)
+    else:
+        await update.message.reply_html(f'Я получил сообщение {update.message.text}')
+
+
+# клавиатура при ознакомлении пользователя с определенным направлением
+course_keyboard = [['/back'],
+                   ['/help']]
+info_keyboad = [['живопись', 'графика'],
+                ['дизайн', 'роспись'],
+                ['/back']]
+reply_keyboard = [['/info', '/test'],
+                  ['/reg', '/help']]
+markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
+markup1 = ReplyKeyboardMarkup(info_keyboad, one_time_keyboard=True)
+markup2 = ReplyKeyboardMarkup(course_keyboard, one_time_keyboard=True)
+
+
+def main():
+    application = Application.builder().token(BOT_TOKEN).build()
+    application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("help", help_command))
+    application.add_handler(CommandHandler("info", info_command))
+    application.add_handler(CommandHandler("test", test_command))
+    application.add_handler(CommandHandler("reg", registration_command))
+    application.add_handler(CommandHandler('back', back_command))
+    text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, echo)
+    application.add_handler(text_handler)
+
+    application.run_polling()
+
+
+if __name__ == '__main__':
+    main()
