@@ -1,10 +1,12 @@
 import logging
-from telegram.ext import Application, MessageHandler, filters
+from telegram.ext import Application, MessageHandler, filters, ConversationHandler, ContextTypes, CallbackQueryHandler
 from config import BOT_TOKEN
 from telegram.ext import CommandHandler
-import datetime as dt
-from telegram import ReplyKeyboardMarkup
+from telegram import InlineKeyboardMarkup, Update, InlineKeyboardButton
 from telegram import ReplyKeyboardRemove
+from admin import message
+from keyboards import markup, markup1, markup2, markup3, markup4
+from test import tests
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
@@ -27,7 +29,8 @@ async def start(update, context):
         "&#11088;Чтобы записаться на обучение используйте команду /reg \n"
         "&#11088;Хотите рисовать, но не можете определиться с направлением? &#128533;"
         " Мы поможем вам, проведя небольшое тестирование, для этого используйте команду /test \n"
-        "&#11088;Если остались вопросы, всегда можно обратиться к администратору &#128222;, используйте команду /help",
+        "&#11088;Если остались вопросы, всегда можно обратиться к администратору &#128222;, используйте команду /help\n"
+        "&#11088;Если хотите убрать клавиатуру, используйте команду /close",
         reply_markup=markup
     )
 
@@ -62,12 +65,105 @@ async def info_command(update, context):
 
 async def registration_command(update, context):
     """Отправляет сообщение когда получена команда /reg"""
-    await update.message.reply_html('Регистрация не доступна на данный момент&#128565;')
+    await update.message.reply_html('Спасибо, что выбрали нас&#128156;\n'
+                                    'Напишите полностью свою фамилию, имя и отчество (если есть)&#129303;',
+                                    reply_markup=markup3)
+    return 1
 
 
 async def test_command(update, context):
     """Отправляет сообщение когда получена команда /test"""
-    await update.message.reply_html('Тесты в процессе разработки&#128579;')
+    await update.message.reply_html('Наш тест поможет Вам определиться с направлением&#128156;\n'
+                                    'Пожалуйста, напишите свое имя и фамилию')
+    return 1
+
+
+async def age(update, context):
+    await update.message.reply_html('Напишите, пожалуйста, свой возраст')
+    return 2
+
+
+async def qw1(update, context):
+    keyboard = [
+        [InlineKeyboardButton(tests[0]['answer'][0], callback_data=tests[0]['answer'][0])],
+        [InlineKeyboardButton(tests[0]['answer'][1], callback_data=tests[0]['answer'][1])],
+        [InlineKeyboardButton(tests[0]['answer'][2], callback_data=tests[0]['answer'][2])],
+        [InlineKeyboardButton(tests[0]['answer'][3], callback_data=tests[0]['answer'][3])]
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_html(tests[0]['question'], reply_markup=reply_markup)
+    return 3
+
+
+async def qw2(update, context):
+    keyboard = [
+        [InlineKeyboardButton(tests[1]['answer'][0], callback_data=f"{tests[1]['answer'][0]}, добавьте себе 1 балл")],
+        [InlineKeyboardButton(tests[1]['answer'][1], callback_data=tests[1]['answer'][1])],
+        [InlineKeyboardButton(tests[1]['answer'][2], callback_data=tests[1]['answer'][2])],
+        [InlineKeyboardButton(tests[1]['answer'][3], callback_data=tests[1]['answer'][3])]
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_html(tests[1]['question'], reply_markup=reply_markup)
+    return 4
+
+
+async def qw3(update, context):
+    keyboard = [
+        [InlineKeyboardButton(tests[2]['answer'][0], callback_data=tests[2]['answer'][0])],
+        [InlineKeyboardButton(tests[2]['answer'][1], callback_data=tests[2]['answer'][1])],
+        [InlineKeyboardButton(tests[2]['answer'][2], callback_data=tests[2]['answer'][2])],
+        [InlineKeyboardButton(tests[2]['answer'][3], callback_data=tests[2]['answer'][3])]
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_html(tests[2]['question'], reply_markup=reply_markup)
+    return 5
+
+
+async def qw4(update, context):
+    keyboard = [
+        [InlineKeyboardButton(tests[3]['answer'][0], callback_data=tests[3]['answer'][0])],
+        [InlineKeyboardButton(tests[3]['answer'][1], callback_data=tests[3]['answer'][1])],
+        [InlineKeyboardButton(tests[3]['answer'][2], callback_data=tests[3]['answer'][2])],
+        [InlineKeyboardButton(tests[3]['answer'][3], callback_data=tests[3]['answer'][3])]
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_html(tests[3]['question'], reply_markup=reply_markup)
+    return 6
+
+
+async def qw5(update, context):
+    keyboard = [
+        [InlineKeyboardButton(tests[4]['answer'][0], callback_data=tests[4]['answer'][0])],
+        [InlineKeyboardButton(tests[4]['answer'][1], callback_data=tests[4]['answer'][1])],
+        [InlineKeyboardButton(tests[4]['answer'][2], callback_data=tests[4]['answer'][2])],
+        [InlineKeyboardButton(tests[4]['answer'][3], callback_data=tests[4]['answer'][3])]
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_html(tests[4]['question'], reply_markup=reply_markup)
+    return 7
+
+
+async def qw6(update, context):
+    keyboard = [
+        [InlineKeyboardButton(tests[5]['answer'][0], callback_data=tests[5]['answer'][0])],
+        [InlineKeyboardButton(tests[5]['answer'][1], callback_data=tests[5]['answer'][1])],
+        [InlineKeyboardButton(tests[5]['answer'][2], callback_data=tests[5]['answer'][2])],
+        [InlineKeyboardButton(tests[5]['answer'][3], callback_data=tests[5]['answer'][3])]
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_html(tests[5]['question'], reply_markup=reply_markup)
+    return 8
+
+
+async def end_test(update, context):
+    await update.message.reply_html(f'Ваш результат: ')
+    return ConversationHandler.END
 
 
 async def back_command(update, context):
@@ -75,34 +171,107 @@ async def back_command(update, context):
     await update.message.reply_html('Пожалуйста, выберите, что вас интересует&#128522;', reply_markup=markup)
 
 
+async def stop(update, context):
+    await update.message.reply_text("Всего доброго!")
+    return ConversationHandler.END
+
+
+async def close_keyboard(update, context):
+    await update.message.reply_text(
+        "Ok",
+        reply_markup=ReplyKeyboardRemove()
+    )
+
+
+async def end_reg(update, context):
+    await update.message.reply_html("Спасибо за оставленную заявку! Администратор свяжется с вами позже")
+    message(update.message.text)
+    return ConversationHandler.END
+
+
+async def course(update, context):
+    keyboard = [
+        [
+            InlineKeyboardButton("живопись", callback_data="живопись"),
+            InlineKeyboardButton("графика", callback_data="графика"),
+        ],
+        [
+            InlineKeyboardButton("дизайн", callback_data="дизайн"),
+            InlineKeyboardButton("роспись", callback_data="роспись"),
+        ],
+    ]
+
+    reply_markup = InlineKeyboardMarkup(keyboard)
+
+    await update.message.reply_text("Выберите пожалуйста направление:", reply_markup=reply_markup)
+    return 2
+
+
+async def end_registration(update, context):
+    await update.message.reply_html('Пожалуйста заполните следующие согласия и пришлите сюда')
+    return 3
+
+
+async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+
+    await query.answer()
+
+    await query.edit_message_text(text=f"Вы выбрали: {query.data}\n"
+                                       f"Пожалуйста, напишите 'ок'")
+
+
 async def echo(update, context):
-    if 'живопись' in update.message.text:
+    if update.message.text in ['живопись', 'графика', 'дизайн', 'роспись']:
         await update.message.reply_html(f'Информация о курсах пока разрабатывается', reply_markup=markup2)
     else:
         await update.message.reply_html(f'Я получил сообщение {update.message.text}')
 
 
-# клавиатура при ознакомлении пользователя с определенным направлением
-course_keyboard = [['/back'],
-                   ['/help']]
-info_keyboad = [['живопись', 'графика'],
-                ['дизайн', 'роспись'],
-                ['/back']]
-reply_keyboard = [['/info', '/test'],
-                  ['/reg', '/help']]
-markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
-markup1 = ReplyKeyboardMarkup(info_keyboad, one_time_keyboard=True)
-markup2 = ReplyKeyboardMarkup(course_keyboard, one_time_keyboard=True)
+conv_handler = ConversationHandler(
+        entry_points=[CommandHandler('reg', registration_command)],
+
+        states={
+            1: [MessageHandler(filters.TEXT & ~filters.COMMAND, course)],
+            2: [MessageHandler(filters.TEXT & ~filters.COMMAND, end_registration)],
+            3: [MessageHandler(filters.TEXT & ~filters.COMMAND, end_reg)]
+        },
+
+        fallbacks=[CommandHandler('stop', stop)]
+    )
+
+
+conv_handler1 = ConversationHandler(
+        entry_points=[CommandHandler('test', test_command)],
+
+        states={
+            1: [MessageHandler(filters.TEXT & ~filters.COMMAND, age)],
+            2: [MessageHandler(filters.TEXT & ~filters.COMMAND, qw1)],
+            3: [MessageHandler(filters.TEXT & ~filters.COMMAND, qw2)],
+            4: [MessageHandler(filters.TEXT & ~filters.COMMAND, qw3)],
+            5: [MessageHandler(filters.TEXT & ~filters.COMMAND, qw4)],
+            6: [MessageHandler(filters.TEXT & ~filters.COMMAND, qw5)],
+            7: [MessageHandler(filters.TEXT & ~filters.COMMAND, qw6)],
+            8: [MessageHandler(filters.TEXT & ~filters.COMMAND, end_test)]
+        },
+
+        fallbacks=[CommandHandler('stop', stop)]
+    )
 
 
 def main():
     application = Application.builder().token(BOT_TOKEN).build()
+    application.add_handler(conv_handler)
+    application.add_handler(conv_handler1)
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("info", info_command))
     application.add_handler(CommandHandler("test", test_command))
     application.add_handler(CommandHandler("reg", registration_command))
     application.add_handler(CommandHandler('back', back_command))
+    application.add_handler(CommandHandler("stop", stop))
+    application.add_handler(CommandHandler("close", close_keyboard))
+    application.add_handler(CallbackQueryHandler(button))
     text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, echo)
     application.add_handler(text_handler)
 
