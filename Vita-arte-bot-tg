@@ -4,9 +4,11 @@ from config import BOT_TOKEN
 from telegram.ext import CommandHandler
 from telegram import InlineKeyboardMarkup, Update, InlineKeyboardButton
 from telegram import ReplyKeyboardRemove
-from admin import message
-from keyboards import markup, markup1, markup2, markup3, markup4
+from admin import message, photo1, photo2, photo3, photo4, photo5
+from keyboards import markup, markup1, markup2, markup3
 from test import tests
+from data import db_session
+from data.users import User
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
@@ -74,6 +76,8 @@ async def registration_command(update, context):
 async def test_command(update, context):
     """Отправляет сообщение когда получена команда /test"""
     await update.message.reply_html('Наш тест поможет Вам определиться с направлением&#128156;\n'
+                                    'За каждый ответ будет начисленно определенное количество баллов\n'
+                                    'В конце введите ваши баллы\n'
                                     'Пожалуйста, напишите свое имя и фамилию')
     return 1
 
@@ -85,75 +89,80 @@ async def age(update, context):
 
 async def qw1(update, context):
     keyboard = [
-        [InlineKeyboardButton(tests[0]['answer'][0], callback_data=tests[0]['answer'][0])],
-        [InlineKeyboardButton(tests[0]['answer'][1], callback_data=tests[0]['answer'][1])],
-        [InlineKeyboardButton(tests[0]['answer'][2], callback_data=tests[0]['answer'][2])],
-        [InlineKeyboardButton(tests[0]['answer'][3], callback_data=tests[0]['answer'][3])]
+        [InlineKeyboardButton(tests[0]['answer'][0], callback_data='1 балл')],
+        [InlineKeyboardButton(tests[0]['answer'][1], callback_data='2 балла')],
+        [InlineKeyboardButton(tests[0]['answer'][2], callback_data='3 балла')],
+        [InlineKeyboardButton(tests[0]['answer'][3], callback_data='4 балла')]
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
+    photo1(update.message.chat_id)
     await update.message.reply_html(tests[0]['question'], reply_markup=reply_markup)
     return 3
 
 
 async def qw2(update, context):
     keyboard = [
-        [InlineKeyboardButton(tests[1]['answer'][0], callback_data=f"{tests[1]['answer'][0]}, добавьте себе 1 балл")],
-        [InlineKeyboardButton(tests[1]['answer'][1], callback_data=tests[1]['answer'][1])],
-        [InlineKeyboardButton(tests[1]['answer'][2], callback_data=tests[1]['answer'][2])],
-        [InlineKeyboardButton(tests[1]['answer'][3], callback_data=tests[1]['answer'][3])]
+        [InlineKeyboardButton(tests[1]['answer'][0], callback_data='1 балл')],
+        [InlineKeyboardButton(tests[1]['answer'][1], callback_data='2 балла')],
+        [InlineKeyboardButton(tests[1]['answer'][2], callback_data='3 балла')],
+        [InlineKeyboardButton(tests[1]['answer'][3], callback_data='4 балла')]
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
+    photo2(update.message.chat_id)
     await update.message.reply_html(tests[1]['question'], reply_markup=reply_markup)
     return 4
 
 
 async def qw3(update, context):
     keyboard = [
-        [InlineKeyboardButton(tests[2]['answer'][0], callback_data=tests[2]['answer'][0])],
-        [InlineKeyboardButton(tests[2]['answer'][1], callback_data=tests[2]['answer'][1])],
-        [InlineKeyboardButton(tests[2]['answer'][2], callback_data=tests[2]['answer'][2])],
-        [InlineKeyboardButton(tests[2]['answer'][3], callback_data=tests[2]['answer'][3])]
+        [InlineKeyboardButton(tests[2]['answer'][0], callback_data='1 балл')],
+        [InlineKeyboardButton(tests[2]['answer'][1], callback_data='2 балла')],
+        [InlineKeyboardButton(tests[2]['answer'][2], callback_data='3 балла')],
+        [InlineKeyboardButton(tests[2]['answer'][3], callback_data='4 балла')]
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
+    photo3(update.message.chat_id)
     await update.message.reply_html(tests[2]['question'], reply_markup=reply_markup)
     return 5
 
 
 async def qw4(update, context):
     keyboard = [
-        [InlineKeyboardButton(tests[3]['answer'][0], callback_data=tests[3]['answer'][0])],
-        [InlineKeyboardButton(tests[3]['answer'][1], callback_data=tests[3]['answer'][1])],
-        [InlineKeyboardButton(tests[3]['answer'][2], callback_data=tests[3]['answer'][2])],
-        [InlineKeyboardButton(tests[3]['answer'][3], callback_data=tests[3]['answer'][3])]
+        [InlineKeyboardButton(tests[3]['answer'][0], callback_data='1 балл')],
+        [InlineKeyboardButton(tests[3]['answer'][1], callback_data='2 балла')],
+        [InlineKeyboardButton(tests[3]['answer'][2], callback_data='3 балла')],
+        [InlineKeyboardButton(tests[3]['answer'][3], callback_data='4 балла')]
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
+    photo4(update.message.chat_id)
     await update.message.reply_html(tests[3]['question'], reply_markup=reply_markup)
     return 6
 
 
 async def qw5(update, context):
     keyboard = [
-        [InlineKeyboardButton(tests[4]['answer'][0], callback_data=tests[4]['answer'][0])],
-        [InlineKeyboardButton(tests[4]['answer'][1], callback_data=tests[4]['answer'][1])],
-        [InlineKeyboardButton(tests[4]['answer'][2], callback_data=tests[4]['answer'][2])],
-        [InlineKeyboardButton(tests[4]['answer'][3], callback_data=tests[4]['answer'][3])]
+        [InlineKeyboardButton(tests[4]['answer'][0], callback_data='1 балл')],
+        [InlineKeyboardButton(tests[4]['answer'][1], callback_data='2 балла')],
+        [InlineKeyboardButton(tests[4]['answer'][2], callback_data='3 балла')],
+        [InlineKeyboardButton(tests[4]['answer'][3], callback_data='4 балла')]
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
+    photo5(update.message.chat_id)
     await update.message.reply_html(tests[4]['question'], reply_markup=reply_markup)
     return 7
 
 
 async def qw6(update, context):
     keyboard = [
-        [InlineKeyboardButton(tests[5]['answer'][0], callback_data=tests[5]['answer'][0])],
-        [InlineKeyboardButton(tests[5]['answer'][1], callback_data=tests[5]['answer'][1])],
-        [InlineKeyboardButton(tests[5]['answer'][2], callback_data=tests[5]['answer'][2])],
-        [InlineKeyboardButton(tests[5]['answer'][3], callback_data=tests[5]['answer'][3])]
+        [InlineKeyboardButton(tests[5]['answer'][0], callback_data='1 балл')],
+        [InlineKeyboardButton(tests[5]['answer'][1], callback_data='2 балла')],
+        [InlineKeyboardButton(tests[5]['answer'][2], callback_data='3 балла')],
+        [InlineKeyboardButton(tests[5]['answer'][3], callback_data='4 балла')]
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -162,7 +171,23 @@ async def qw6(update, context):
 
 
 async def end_test(update, context):
-    await update.message.reply_html(f'Ваш результат: ')
+    await update.message.reply_html(f'Введите Ваш результат: ')
+    return 9
+
+
+async def ending_test(update, context):
+    if int(update.message.text) in range(6, 14):
+        await update.message.reply_html('Вероятнее всего вам подходит направление Живопись')
+    elif int(update.message.text) in range(14, 20):
+        await update.message.reply_html(f'Вероятнее всего вам подходит направление Графика')
+    elif int(update.message.text) in range(20, 27):
+        await update.message.reply_html(f'Вероятнее всего вам подходит направление Дизайн')
+    elif int(update.message.text) in range(27, 36):
+        await update.message.reply_html(f'Вероятнее всего вам подходит направление Роспись')
+    else:
+        await update.message.reply_html(f'Пожалуйста, пересчитайте баллы, возможно вы ошиблись&#128565;')
+    await update.message.reply_html(f'Спасибо за участие в тестировании&#128519;\n'
+                                    f'Надеемся, что помогли вам определиться&#128156;')
     return ConversationHandler.END
 
 
@@ -185,6 +210,13 @@ async def close_keyboard(update, context):
 
 async def end_reg(update, context):
     await update.message.reply_html("Спасибо за оставленную заявку! Администратор свяжется с вами позже")
+    user = User()
+    user.name = "Пользователь 1"
+    user.email = "email@email.ru"
+    user.hashed_password = 'KJSnxkjn'
+    db_sess = db_session.create_session()
+    db_sess.add(user)
+    db_sess.commit()
     message(update.message.text)
     return ConversationHandler.END
 
@@ -252,7 +284,8 @@ conv_handler1 = ConversationHandler(
             5: [MessageHandler(filters.TEXT & ~filters.COMMAND, qw4)],
             6: [MessageHandler(filters.TEXT & ~filters.COMMAND, qw5)],
             7: [MessageHandler(filters.TEXT & ~filters.COMMAND, qw6)],
-            8: [MessageHandler(filters.TEXT & ~filters.COMMAND, end_test)]
+            8: [MessageHandler(filters.TEXT & ~filters.COMMAND, end_test)],
+            9: [MessageHandler(filters.TEXT & ~filters.COMMAND, ending_test)]
         },
 
         fallbacks=[CommandHandler('stop', stop)]
@@ -274,7 +307,7 @@ def main():
     application.add_handler(CallbackQueryHandler(button))
     text_handler = MessageHandler(filters.TEXT & ~filters.COMMAND, echo)
     application.add_handler(text_handler)
-
+    db_session.global_init("db/blogs.db")
     application.run_polling()
 
 
