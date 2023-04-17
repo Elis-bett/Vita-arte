@@ -9,6 +9,7 @@ from keyboards import markup, markup1, markup2, markup3
 from test import tests
 from data import db_session
 from data.users import User
+from password_maker import password
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG
@@ -209,11 +210,15 @@ async def close_keyboard(update, context):
 
 
 async def end_reg(update, context):
+    passw = password()
+    email = "email@email.ru"
     await update.message.reply_html("Спасибо за оставленную заявку! Администратор свяжется с вами позже")
     user = User()
     user.name = "Пользователь 1"
     user.email = "email@email.ru"
-    user.hashed_password = 'KJSnxkjn'
+    user.hashed_password = passw
+    await update.message.reply_html(f"Ваш пароль: {passw} \n"
+                                    f"Ваш логин: {email}")
     db_sess = db_session.create_session()
     db_sess.add(user)
     db_sess.commit()
@@ -313,3 +318,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    
