@@ -38,3 +38,22 @@ def photo4(chat_id):
 def photo5(chat_id):
     photo = open('images/image5.jpg', 'rb')
     bot.send_photo(chat_id=chat_id, photo=photo)
+
+
+@bot.message_handler(content_types=["file"])
+def sogl(chat_id):
+    photo = open('images/soglasie_na_pd.docx', 'rb')
+    bot.send_document(chat_id=chat_id, document=photo)
+
+
+@bot.message_handler(content_types=["photo"])
+def photo6(chat_id):
+    photo = open('images/image6.jpg', 'rb')
+    bot.send_photo(chat_id=chat_id, photo=photo)
+
+
+@bot.message_handler(content_types=["photo"])
+def photo7(chat_id):
+    photo = open('images/image7.jpg', 'rb')
+    bot.send_photo(chat_id=chat_id, photo=photo)
+    
