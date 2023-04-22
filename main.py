@@ -1,10 +1,11 @@
 import logging
+import random
 from telegram.ext import Application, MessageHandler, filters, ConversationHandler, ContextTypes, CallbackQueryHandler
 from config import BOT_TOKEN
 from telegram.ext import CommandHandler
 from telegram import InlineKeyboardMarkup, Update, InlineKeyboardButton
 from telegram import ReplyKeyboardRemove
-from admin import message, photo1, photo2, photo3, photo4, photo5
+from admin import message, photo1, photo2, photo3, photo4, photo5, sogl, photo6, photo7
 from keyboards import markup, markup1, markup2, markup3
 from test import tests
 from data import db_session
@@ -40,7 +41,8 @@ async def start(update, context):
 
 async def help_command(update, context):
     """Отправляет сообщение когда получена команда /help"""
-    await update.message.reply_html("Я пока не умею помогать... Я только ваше эхо.")
+    await update.message.reply_html("Если возникли проблемы, всегда можно обратиться к нашему администратору:"
+                                    "@Betty_Ionina")
 
 
 async def info_command(update, context):
@@ -71,7 +73,7 @@ async def registration_command(update, context):
     await update.message.reply_html('Спасибо, что выбрали нас&#128156;\n'
                                     'Напишите полностью свою фамилию, имя и отчество (если есть)&#129303;',
                                     reply_markup=markup3)
-    return 1
+    return 11
 
 
 async def test_command(update, context):
@@ -177,18 +179,23 @@ async def end_test(update, context):
 
 
 async def ending_test(update, context):
-    if int(update.message.text) in range(6, 14):
-        await update.message.reply_html('Вероятнее всего вам подходит направление Живопись')
-    elif int(update.message.text) in range(14, 20):
-        await update.message.reply_html(f'Вероятнее всего вам подходит направление Графика')
-    elif int(update.message.text) in range(20, 27):
-        await update.message.reply_html(f'Вероятнее всего вам подходит направление Дизайн')
-    elif int(update.message.text) in range(27, 36):
-        await update.message.reply_html(f'Вероятнее всего вам подходит направление Роспись')
+    if update.message.text.isdigit():
+        if int(update.message.text) in range(6, 14):
+            await update.message.reply_html('Вероятнее всего вам подходит направление Живопись')
+        elif int(update.message.text) in range(14, 20):
+            await update.message.reply_html(f'Вероятнее всего вам подходит направление Графика')
+        elif int(update.message.text) in range(20, 27):
+            await update.message.reply_html(f'Вероятнее всего вам подходит направление Дизайн')
+        elif int(update.message.text) in range(27, 36):
+            await update.message.reply_html(f'Вероятнее всего вам подходит направление Роспись')
+        else:
+            await update.message.reply_html(f'Пожалуйста, пересчитайте баллы, возможно вы ошиблись&#128565;')
+        await update.message.reply_html(f'Спасибо за участие в тестировании&#128519;\n'
+                                        f'Надеемся, что помогли вам определиться&#128156;')
     else:
         await update.message.reply_html(f'Пожалуйста, пересчитайте баллы, возможно вы ошиблись&#128565;')
-    await update.message.reply_html(f'Спасибо за участие в тестировании&#128519;\n'
-                                    f'Надеемся, что помогли вам определиться&#128156;')
+        await update.message.reply_html(f'Спасибо за участие в тестировании&#128519;\n'
+                                        f'Надеемся, что помогли вам определиться&#128156;')
     return ConversationHandler.END
 
 
@@ -198,7 +205,7 @@ async def back_command(update, context):
 
 
 async def stop(update, context):
-    await update.message.reply_text("Всего доброго!")
+    await update.message.reply_text("Всего доброго!", reply_markup=markup)
     return ConversationHandler.END
 
 
@@ -211,22 +218,25 @@ async def close_keyboard(update, context):
 
 async def end_reg(update, context):
     passw = password()
+    message(f" Новый зарегистрированный пользователь @{update.message.from_user.username} \n"
+            f"email: {update.message.text}")
     email = "email@email.ru"
     await update.message.reply_html("Спасибо за оставленную заявку! Администратор свяжется с вами позже")
     user = User()
-    user.name = "Пользователь 1"
-    user.email = "email@email.ru"
+    user.name = context.user_data['name']
+    user.email = update.message.text
     user.hashed_password = passw
     await update.message.reply_html(f"Ваш пароль: {passw} \n"
-                                    f"Ваш логин: {email}")
+                                    f"Ваш логин: ваша эллектронная почта\n"
+                                    "Для завершения регистрации, нажмите команду /stop", reply_markup=markup3)
     db_sess = db_session.create_session()
     db_sess.add(user)
     db_sess.commit()
-    message(update.message.text)
     return ConversationHandler.END
 
 
 async def course(update, context):
+    context.user_data['name'] = update.message.text
     keyboard = [
         [
             InlineKeyboardButton("живопись", callback_data="живопись"),
@@ -241,12 +251,14 @@ async def course(update, context):
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     await update.message.reply_text("Выберите пожалуйста направление:", reply_markup=reply_markup)
-    return 2
+    return 12
 
 
 async def end_registration(update, context):
     await update.message.reply_html('Пожалуйста заполните следующие согласия и пришлите сюда')
-    return 3
+    sogl(update.message.chat_id)
+    await update.message.reply_html('Так же пришлите пожалуйста свою электронную почту')
+    return 13
 
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -259,19 +271,43 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 
 async def echo(update, context):
-    if update.message.text in ['живопись', 'графика', 'дизайн', 'роспись']:
+    if update.message.text.lower()  in ['живопись', 'графика', 'дизайн', 'роспись']:
         await update.message.reply_html(f'Информация о курсах пока разрабатывается', reply_markup=markup2)
+    elif 'привет' in update.message.text.lower() or 'здравствуйте' in update.message.text.lower():
+        await update.message.reply_html(random.choice(['Привет от команды Vita-arte	&#128075;', 'Доброго времени суток',
+                                                       'Вас приветствует команда Vita-arte&#128156;']),
+                                        reply_markup=markup)
+    elif 'направления ' in update.message.text.lower() or 'курсы' in update.message.text.lower():
+        await update.message.reply_html(f'Информация о курсах пока разрабатывается', reply_markup=markup2)
+    elif 'педагог ' in update.message.text.lower() or 'учител' in update.message.text.lower():
+        await update.message.reply_html(f'Наши учителя:', reply_markup=markup)
+        photo6(update.message.chat_id)
+    elif 'регистр ' in update.message.text.lower():
+        await update.message.reply_html(f'Для регистрации воспользуйтесь командой /reg', reply_markup=markup)
+    elif 'бот ' in update.message.text.lower():
+        await update.message.reply_html(random.choice(['Я здесь&#9995;', 'Жду ваших вопросов&#128526;',
+                                                       'Я на связи']), reply_markup=markup)
+    elif 'админ ' in update.message.text.lower():
+        await update.message.reply_html(f'Вам всегда поможет наш администратор @Betty_Ionina', reply_markup=markup)
+    elif 'тест' in update.message.text.lower():
+        await update.message.reply_html(f'Если вы хотите пройти тестирование, воспользуйтесь командой /test',
+                                        reply_markup=markup)
+    elif 'школ' in update.message.text.lower():
+        await update.message.reply_html(f'Вы можете узнать более подробную информацию, нажав команду /info',
+                                        reply_markup=markup)
+        photo7(update.message.chat_id)
     else:
-        await update.message.reply_html(f'Я получил сообщение {update.message.text}')
+        await update.message.reply_html(f'Извините, я вас не понимаю&#128533;\n'
+                                        f'Воспользуйтесь командами на клавиатуре', reply_markup=markup)
 
 
 conv_handler = ConversationHandler(
         entry_points=[CommandHandler('reg', registration_command)],
 
         states={
-            1: [MessageHandler(filters.TEXT & ~filters.COMMAND, course)],
-            2: [MessageHandler(filters.TEXT & ~filters.COMMAND, end_registration)],
-            3: [MessageHandler(filters.TEXT & ~filters.COMMAND, end_reg)]
+            11: [MessageHandler(filters.TEXT & ~filters.COMMAND, course)],
+            12: [MessageHandler(filters.TEXT & ~filters.COMMAND, end_registration)],
+            13: [MessageHandler(filters.TEXT & ~filters.COMMAND, end_reg)]
         },
 
         fallbacks=[CommandHandler('stop', stop)]
