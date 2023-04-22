@@ -7,7 +7,8 @@ info_keyboad = [['живопись', 'графика'],
                 ['/back']]
 reply_keyboard = [['/info', '/test'],
                   ['/reg', '/help']]
-back_keyboard = [['/back']]
+back_keyboard = [['/back'],
+                 ['/stop']]
 markup = ReplyKeyboardMarkup(reply_keyboard, one_time_keyboard=False)
 markup1 = ReplyKeyboardMarkup(info_keyboad, one_time_keyboard=False)
 markup2 = ReplyKeyboardMarkup(course_keyboard, one_time_keyboard=False)
